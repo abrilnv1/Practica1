@@ -8,12 +8,14 @@ const COLLECTION = 'TASK';
 @Injectable({providedIn: 'root'})
 
 export class TaskStorageService implements TaskRepository{
+    // CREA UNA NUEVA TAREA
     async  createTask(task: Task) {
         await Preferences.set({
             key: COLLECTION + "-" + task.id , 
             value: JSON.stringify(task)
         });
     }
+    // TRAE TODAS LAS TAREAS
     async getTask(): Promise<Task[]> {
         const collection = await Preferences.keys();
         const tasks: Task[] = [];
@@ -25,14 +27,27 @@ export class TaskStorageService implements TaskRepository{
         })
         return tasks;
     }
+    // TRAE UNA SOLA TAREA
     async  getTaskById(id: string): Promise<Task | null> {
         throw new Error("Method not implemented.");
     }
+    // EDITA UNA TAREA
     updateTask(id: string, updatedTask: Task): boolean {
-        throw new Error("Method not implemented.");
+        const tasks = COLLECTION + "-" + id;
+        const taskData = JSON.stringify(updatedTask);
+
+        Preferences.set({
+            key: tasks,
+            value: taskData
+        });
+    
+        return true;
     }
+    // ELIMINA UNA TAREA
     deleteTask(id: string): boolean {
-        throw new Error("Method not implemented.");
+        const tasks = COLLECTION + "-" + id;
+        Preferences.remove({ key: tasks });
+        return true;
     }
     
 }
