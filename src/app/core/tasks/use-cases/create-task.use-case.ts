@@ -5,7 +5,7 @@ import { TaskRepository } from "../interfaces/task.repository";
 @Injectable({providedIn: 'root'})
 
 
-class CreateTaskUseCase {
+export class CreateTaskUseCase {
     constructor (
         private repository : TaskRepository
     ) {}

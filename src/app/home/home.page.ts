@@ -1,5 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { IonModal, ModalController } from '@ionic/angular';
+import { GetTaskUseCase } from "./../core/tasks/use-cases/get-task.use-case";
+import { CreateTaskUseCase } from "./../core/tasks/use-cases/create-task.use-case";
 
 interface tarea {
   id: string;
@@ -22,13 +24,22 @@ export class HomePage {
   descripcion: string = "";
   prioridad: string = "";
   
-  constructor() {}
+  constructor(
+    private ModalController: ModalController,
+    private getTaskUseCase: GetTaskUseCase,
+    private createTaskUseCase : CreateTaskUseCase,
+  ) {}
 
-  cancelModal() {
+  async ngOnInit(){
+    this.tareas = (await this.getTaskUseCase.execute());
+  }
+  
+
+  cancel() {
     this.modal.dismiss(null, 'cancel');
   }
 
-  confirmModal() {
+  async confirm() {
 
     if (this.tareaEditada) {
       this.tareaEditada.nombre = this.nombre;
@@ -36,22 +47,14 @@ export class HomePage {
       this.tareaEditada.prioridad = this.prioridad;
     }
     else {
-    const uid = new Date().toString();
-    const tarea = {
-      id: uid,
-      nombre: this.nombre,
-      descripcion: this.descripcion,
-      prioridad: this.prioridad
-    };
-
-    this.tareas.push(tarea);
+      await this.createTaskUseCase.execute(this.nombre, this.descripcion, this.prioridad);
+      this.tareas = (await this.getTaskUseCase.execute());
     }
 
     //LIMPIAR LOS DATOS
     this.nombre = "";
     this.descripcion= "";
     this.prioridad="";
-
     this.modal.dismiss(null, 'confirm');
   }
 

@@ -1,7 +1,10 @@
+import { Injectable } from "@angular/core";
 import { Task } from "../entities/task";
 import { TaskRepository } from "../interfaces/task.repository";
 
-class GetTaskUseCase {
+@Injectable({providedIn: 'root'})
+
+export class GetTaskUseCase {
    constructor (
     private repository : TaskRepository
    ) {}
