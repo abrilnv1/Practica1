@@ -1,14 +1,23 @@
-import { Injectable } from "@angular/core";
+import { Task } from "../entities/task";
 import { TaskRepository } from "../interfaces/task.repository";
+import { Injectable } from "@angular/core";
 
-@Injectable({providedIn: 'root'})
 
-export class DeleteTaskUseCase {
-    constructor (
-        private repository : TaskRepository
-    ){}
+export @Injectable({providedIn: 'root'})
 
-    async execute(id: string): Promise<void>{
-        await this.repository.deleteTask(id);
+class DeleteTaskUseCase {
+    
+    constructor (private repository : TaskRepository) {}
+
+    async execute(taskId: string): Promise<void> {
+       
+        const existingTask = await this.repository.getTaskById(taskId);
+        
+        if (!existingTask) {
+            throw new Error(`Tarea con ID ${taskId} no encontrada.`);
+        }
+
+        return await this.repository.deleteTask(taskId)
     }
+      
 }

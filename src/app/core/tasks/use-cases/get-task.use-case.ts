@@ -1,17 +1,18 @@
-import { Injectable } from "@angular/core";
 import { Task } from "../entities/task";
 import { TaskRepository } from "../interfaces/task.repository";
+import { Injectable } from "@angular/core";
 
-@Injectable({providedIn: 'root'})
 
-export class GetTaskUseCase {
-   constructor (
-    private repository : TaskRepository
-   ) {}
+export @Injectable({providedIn: 'root'})
+
+
+class GetTaskUseCase {
+   
+   constructor (private repository : TaskRepository) {}
 
    async execute () : Promise <Task[]> {
-    const task = await this.repository.getTask();
-    return task;
+      const task = await this.repository.getTask();
+      return task;
    }
    
   }

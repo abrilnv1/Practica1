@@ -1,18 +1,17 @@
-import { Injectable } from "@angular/core";
 import { Task } from "../entities/task";
 import { TaskRepository } from "../interfaces/task.repository";
+import { Injectable } from "@angular/core";
 
-@Injectable({providedIn: 'root'})
 
+export @Injectable({providedIn: 'root'})
 
-export class CreateTaskUseCase {
-    constructor (
-        private repository : TaskRepository
-    ) {}
+class CreateTaskUseCase {
+
+    constructor (private repository : TaskRepository) {}
 
     async execute (nombre:string, descripcion:string, prioridad:string) : Promise <Task> {
         const id = new Date().toString();
-        const estado = false;
+        const estado = true;
 
         const task = new Task();
         task.id = id;

@@ -1,53 +1,79 @@
 import { Injectable } from "@angular/core";
+import { Preferences } from "@capacitor/preferences";
 import { Task } from "src/app/core/tasks/entities/task";
 import { TaskRepository } from "src/app/core/tasks/interfaces/task.repository";
-import { Preferences } from "@capacitor/preferences";
 
 const COLLECTION = 'TASK';
 
 @Injectable({providedIn: 'root'})
 
 export class TaskStorageService implements TaskRepository{
-    // CREA UNA NUEVA TAREA
+
     async  createTask(task: Task) {
         await Preferences.set({
-            key: COLLECTION + "-" + task.id , 
+            key: COLLECTION + "-" + task.id ,
             value: JSON.stringify(task)
         });
     }
-    // TRAE TODAS LAS TAREAS
+
     async getTask(): Promise<Task[]> {
         const collection = await Preferences.keys();
-        const tasks: Task[] = [];
+        const task: Task[] = [];
 
         collection.keys.filter(key => key.startsWith(COLLECTION))
         .forEach(async key => {
-            const data = (await Preferences.get({key})).value;
-            if(data) tasks.push(JSON.parse(data));
+            const data  = (await Preferences.get({key})).value;
+            if(data) task.push(JSON.parse(data));
         })
-        return tasks;
+        return task;
     }
-    // TRAE UNA SOLA TAREA
-    async  getTaskById(id: string): Promise<Task | null> {
-        throw new Error("Method not implemented.");
-    }
-    // EDITA UNA TAREA
-    updateTask(id: string, updatedTask: Task): boolean {
-        const tasks = COLLECTION + "-" + id;
-        const taskData = JSON.stringify(updatedTask);
 
-        Preferences.set({
-            key: tasks,
-            value: taskData
-        });
+    async getTaskById(id: string): Promise<Task | null> {
+        const collection = await Preferences.keys();
     
+        for (const key of collection.keys) {
+            if (key.startsWith(COLLECTION)) {
+            const data = (await Preferences.get({ key })).value
+            if (data) {
+                const task = JSON.parse(data)
+                if (task.id === id) {
+                return task
+                }
+            }
+            }
+        }
+        
+        return null
+    }
+
+    async updateTask(id: string, updatedTask: Task): Promise<boolean> {
+
+        const taskId = id;
+        const key = COLLECTION + "-" + taskId;
+        const existingData = (await Preferences.get({ key })).value;
+
+        if (!existingData) {
+            throw new Error(`Tarea con ID ${taskId} no encontrada`)
+        }
+
+        await Preferences.set({
+            key,
+            value: JSON.stringify(updatedTask)
+        });
+
         return true;
     }
-    // ELIMINA UNA TAREA
-    deleteTask(id: string): boolean {
-        const tasks = COLLECTION + "-" + id;
-        Preferences.remove({ key: tasks });
-        return true;
+    
+    async deleteTask(id: string): Promise<void> {
+        const key = COLLECTION + "-" + id;
+
+        const existingData = (await Preferences.get({ key })).value;
+        
+        if (!existingData) {
+            throw new Error(`Tarea con ID ${id} no encontrada`);
+        }
+
+        await Preferences.remove({ key });
     }
     
 }
